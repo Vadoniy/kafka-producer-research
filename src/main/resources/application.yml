@@ -1,0 +1,12 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+#      value-serializer: com.example.kafkaresearch.config.TestDtoSerializer
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+#      key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema:
+          registry:
+            url: http://localhost:8081

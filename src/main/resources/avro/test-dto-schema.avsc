@@ -1,0 +1,14 @@
+{
+    "type": "record",
+    "name": "TestAvroDto",
+    "namespace": "com.example.avro",
+    "fields": [
+    {
+        "name": "id",
+        "type": "long"
+    },
+    {
+        "name": "name",
+        "type": "string"
+    }]
+}
