@@ -1,5 +1,6 @@
 package com.example.kafkaresearch.rest;
 
+import com.example.avro.TestAvroDto;
 import com.example.kafkaresearch.dto.TestDto;
 import com.example.kafkaresearch.enums.KafkaTopic;
 import com.example.kafkaresearch.producer.KafkaMessageSendService;
@@ -25,9 +26,9 @@ public class CommonRestController {
         return payload;
     }
 
-    @PostMapping("/kafka/dto")
-    public TestDto kafkaPayload(@RequestBody TestDto testDto) {
-        kafkaMessageSendService.sendAvroDtoMessage(KafkaTopic.AVRO, testDto);
-        return testDto;
+    @PostMapping("/kafka/avro/test-dto")
+    public TestAvroDto kafkaPayload(@RequestBody TestAvroDto testAvroDto) {
+        kafkaMessageSendService.sendAvroDtoMessage(KafkaTopic.AVRO, testAvroDto);
+        return testAvroDto;
     }
 }

@@ -2,9 +2,9 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     producer:
-#      value-serializer: com.example.kafkaresearch.config.TestDtoSerializer
+      #      value-serializer: com.example.kafkaresearch.config.TestDtoSerializer
       key-serializer: org.apache.kafka.common.serialization.LongSerializer
-#      key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      #      key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       properties:
         schema:
