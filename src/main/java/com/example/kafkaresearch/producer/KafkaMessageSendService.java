@@ -20,15 +20,17 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class KafkaMessageSendService {
 
-    private final KafkaTemplate<String, TestAvroDto> kafkaTemplate;
+    private final KafkaTemplate<String, TestAvroDto> avroKafkaTemplate;
+    private final KafkaTemplate<String, String> stringKafkaTemplate;
+    private final KafkaTemplate<String, String> customKafkaTemplate;
 
     public void sendStringMessage(KafkaTopic kafkaTopic, String payload) {
         final var topicName = Optional.ofNullable(kafkaTopic)
                 .map(KafkaTopic::getTopicName)
-                .orElse(KafkaTopic.DEFAULT.getTopicName());
-        final var msg = new GenericMessage<>(payload, Map.of(KafkaHeaders.TOPIC, topicName, KafkaHeaders.GROUP_ID, "default"));
+                .orElse(KafkaTopic.STRING.getTopicName());
+        final var msg = new GenericMessage<>(payload, Map.of(KafkaHeaders.TOPIC, topicName, KafkaHeaders.GROUP_ID, "string-consumer-group"));
         try {
-            System.out.println(kafkaTemplate.send(msg).get());
+            System.out.println(stringKafkaTemplate.send(msg).get());
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -37,10 +39,10 @@ public class KafkaMessageSendService {
     public void sendDtoMessage(KafkaTopic kafkaTopic, TestDto payload) {
         final var topicName = Optional.ofNullable(kafkaTopic)
                 .map(KafkaTopic::getTopicName)
-                .orElse(KafkaTopic.DEFAULT.getTopicName());
-        final var msg = new GenericMessage<>(payload, Map.of(KafkaHeaders.TOPIC, topicName, KafkaHeaders.GROUP_ID, "default"));
+                .orElse(KafkaTopic.CUSTOM.getTopicName());
+        final var msg = new GenericMessage<>(payload, Map.of(KafkaHeaders.TOPIC, topicName, KafkaHeaders.GROUP_ID, "custom-consumer-group"));
         try {
-            System.out.println(kafkaTemplate.send(msg).get());
+            System.out.println(customKafkaTemplate.send(msg).get());
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -49,14 +51,13 @@ public class KafkaMessageSendService {
     public void sendAvroDtoMessage(KafkaTopic kafkaTopic, TestAvroDto testAvroDto) {
         final var topicName = Optional.ofNullable(kafkaTopic)
                 .map(KafkaTopic::getTopicName)
-                .orElse(KafkaTopic.DEFAULT.getTopicName());
-//        final var payload = testDtoToAvro.convert(testAvroDto);
+                .orElse(KafkaTopic.AVRO.getTopicName());
         final var message = MessageBuilder.withPayload(testAvroDto)
                 .setHeader(KafkaHeaders.TOPIC, topicName)
-                .setHeader(KafkaHeaders.GROUP_ID, "default-avro")
+                .setHeader(KafkaHeaders.GROUP_ID, "avro-consumer-group")
                 .setHeader(KafkaHeaders.KEY, testAvroDto.getId())
                 .build();
 
-        kafkaTemplate.send(message);
+        avroKafkaTemplate.send(message);
     }
 }

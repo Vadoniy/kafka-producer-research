@@ -1,12 +1,22 @@
 spring:
   kafka:
     bootstrap-servers: localhost:9092
-    producer:
-      #      value-serializer: com.example.kafkaresearch.config.TestDtoSerializer
-      key-serializer: org.apache.kafka.common.serialization.LongSerializer
-      #      key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-      properties:
-        schema:
-          registry:
-            url: http://localhost:8081
+
+kafka-producer:
+  avro-producer:
+    key-serializer: org.apache.kafka.common.serialization.LongSerializer
+    value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    group-id: "avro-consumer-group"
+    topic-name: "mytopic-avro"
+    properties:
+      schema:
+        registry:
+          url: http://localhost:8081
+  string-producer:
+    key-serializer: org.apache.kafka.common.serialization.LongSerializer
+    value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    group-id: "string-consumer-group"
+  custom-producer:
+    key-serializer: org.apache.kafka.common.serialization.LongSerializer
+    value-serializer: com.example.kafkaresearch.config.TestDtoSerializer
+    group-id: "custom-consumer-group"

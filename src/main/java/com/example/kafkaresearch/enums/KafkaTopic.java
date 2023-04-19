@@ -4,8 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum KafkaTopic {
-    AVRO ("mytopic-avro"),
-    DEFAULT ("mytopic");
+    AVRO ("avro-serializer-topic"),
+    STRING ("string-serializer-topic"),
+    CUSTOM ("custom-serializer-topic");
 
     private String topicName;
 

@@ -1,14 +1,27 @@
 {
-    "type": "record",
-    "name": "TestAvroDto",
-    "namespace": "com.example.avro",
-    "fields": [
+  "namespace": "com.example.avro",
+  "type": "record",
+  "name": "TestAvroDto",
+  "fields": [
     {
-        "name": "id",
-        "type": "long"
+      "name": "id",
+      "type": "long"
     },
     {
-        "name": "name",
-        "type": "string"
-    }]
+      "name": "name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "testField",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    }
+  ]
 }

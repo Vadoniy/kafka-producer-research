@@ -22,7 +22,7 @@ public class CommonRestController {
         final var payload = Optional.ofNullable(payloadInput)
                 .map(String::toUpperCase)
                 .orElse("Empty string");
-        kafkaMessageSendService.sendStringMessage(KafkaTopic.DEFAULT, payload);
+        kafkaMessageSendService.sendStringMessage(KafkaTopic.STRING, payload);
         return payload;
     }
 
@@ -30,5 +30,11 @@ public class CommonRestController {
     public TestAvroDto kafkaPayload(@RequestBody TestAvroDto testAvroDto) {
         kafkaMessageSendService.sendAvroDtoMessage(KafkaTopic.AVRO, testAvroDto);
         return testAvroDto;
+    }
+
+    @PostMapping("/kafka/test-dto")
+    public TestDto kafkaPayload(@RequestBody TestDto testDto) {
+        kafkaMessageSendService.sendDtoMessage(KafkaTopic.CUSTOM, testDto);
+        return testDto;
     }
 }
