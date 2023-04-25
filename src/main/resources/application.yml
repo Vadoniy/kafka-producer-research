@@ -20,3 +20,8 @@ kafka-producer:
     key-serializer: org.apache.kafka.common.serialization.LongSerializer
     value-serializer: com.example.kafkaresearch.config.TestDtoSerializer
     group-id: "custom-consumer-group"
+
+kafka-topic-names:
+#  avro: "avro-serializer-topic"
+#  string: "string-serializer-topic"
+  custom: "custom-serializer-topic"

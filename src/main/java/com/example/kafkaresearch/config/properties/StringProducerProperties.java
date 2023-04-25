@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "kafka-producer.string-producer")
 @Getter
 @Setter
-public class StringProducerProperties {
+public class StringProducerProperties implements ProducerProperties {
 
     private String keySerializer;
 

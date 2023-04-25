@@ -23,8 +23,8 @@ public class TestDtoSerializer implements Serializer<TestDto> {
             if (dto == null) {
                 return null;
             }
-            if (dto.getName() != null) {
-                serializedName = dto.getName().getBytes(StandardCharsets.UTF_8);
+            if (dto.name() != null) {
+                serializedName = dto.name().getBytes(StandardCharsets.UTF_8);
                 stringSize = serializedName.length;
             } else {
                 serializedName = new byte[0];
@@ -32,12 +32,12 @@ public class TestDtoSerializer implements Serializer<TestDto> {
             }
 
             final var buffer = ByteBuffer.allocate(8 + 4 + stringSize);
-            buffer.putLong(dto.getId());
+            buffer.putLong(dto.id());
             buffer.putInt(stringSize);
             buffer.put(serializedName);
             return buffer.array();
         } catch (Exception exception) {
-            throw new SerializationException("Error during serialization of dto with id " + dto.getId() + ":" + exception);
+            throw new SerializationException("Error during serialization of dto with id " + dto.id() + ":" + exception);
         }
     }
 }

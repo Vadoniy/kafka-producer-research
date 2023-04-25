@@ -11,7 +11,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "kafka-producer.avro-producer")
 @Getter
 @Setter
-public class AvroKafkaProducerProperties {
+public class AvroKafkaProducerProperties implements ProducerProperties {
 
     private String keySerializer;
 

@@ -3,6 +3,7 @@ package com.example.kafkaresearch.config;
 import com.example.avro.TestAvroDto;
 import com.example.kafkaresearch.config.properties.AvroKafkaProducerProperties;
 import com.example.kafkaresearch.config.properties.CustomProducerProperties;
+import com.example.kafkaresearch.config.properties.ProducerProperties;
 import com.example.kafkaresearch.config.properties.StringProducerProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -12,8 +13,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
@@ -26,47 +29,60 @@ public class KafkaProducerConfig {
 
     //1. Send Avro data to Kafka
     @Bean
-    public ProducerFactory<String, TestAvroDto> avroProducerFactory() throws ClassNotFoundException {
-        final var props = new HashMap<String, Object>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Class.forName(avroKafkaProducerProperties.getKeySerializer()));
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Class.forName(avroKafkaProducerProperties.getValueSerializer()));
-        props.putAll(avroKafkaProducerProperties.getProperties());
+    public ProducerFactory<Long, TestAvroDto> avroProducerFactory() {
+        final var props = createProducerProperties(avroKafkaProducerProperties);
         return new DefaultKafkaProducerFactory<>(props);
     }
 
     @Bean
-    public KafkaTemplate<String, TestAvroDto> avroKafkaTemplate() throws ClassNotFoundException {
+    public KafkaTemplate<Long, TestAvroDto> avroKafkaTemplate() {
         return new KafkaTemplate<>(avroProducerFactory());
     }
 
     //2. Send custom data to Kafka
     @Bean
-    public ProducerFactory<String, String> customProducerFactory() throws ClassNotFoundException {
-        final var props = new HashMap<String, Object>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Class.forName(customProducerProperties.getKeySerializer()));
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Class.forName(customProducerProperties.getValueSerializer()));
+    public ProducerFactory<Long, String> customProducerFactory() {
+        final var props = createProducerProperties(customProducerProperties);
         return new DefaultKafkaProducerFactory<>(props);
     }
 
     @Bean
-    public KafkaTemplate<String, String> customKafkaTemplate() throws ClassNotFoundException {
+    public KafkaTemplate<Long, String> customKafkaTemplate() {
         return new KafkaTemplate<>(customProducerFactory());
     }
 
     //3. Send String data to Kafka
     @Bean
-    public ProducerFactory<String, String> stringProducerFactory() throws ClassNotFoundException {
-        final var props = new HashMap<String, Object>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Class.forName(stringProducerProperties.getKeySerializer()));
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Class.forName(stringProducerProperties.getValueSerializer()));
+    public ProducerFactory<Long, String> stringProducerFactory() {
+        final var props = createProducerProperties(stringProducerProperties);
         return new DefaultKafkaProducerFactory<>(props);
     }
 
     @Bean
-    public KafkaTemplate<String, String> stringKafkaTemplate() throws ClassNotFoundException {
+    public KafkaTemplate<Long, String> stringKafkaTemplate() {
         return new KafkaTemplate<>(stringProducerFactory());
+    }
+
+    private Map<String, Object> createProducerProperties(ProducerProperties producerProperties) {
+        final var props = kafkaProperties.buildProducerProperties();
+        try {
+            props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                    Class.forName(producerProperties.getKeySerializer()));
+            props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                    Class.forName(producerProperties.getValueSerializer()));
+        } catch (ClassNotFoundException e) {
+            final var errorMessage = String.format("""
+                            Key or value serializer class is not found from property class %s:
+                            key-serializer: %s
+                            value-serializer: %s""",
+                    producerProperties.getClass().getName(),
+                    producerProperties.getKeySerializer(),
+                    producerProperties.getValueSerializer());
+            throw new RuntimeException(errorMessage, e);
+        }
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        Optional.ofNullable(producerProperties.getProperties())
+                .ifPresent(props::putAll);
+        return props;
     }
 }

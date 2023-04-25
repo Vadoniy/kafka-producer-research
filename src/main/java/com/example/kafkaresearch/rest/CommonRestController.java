@@ -32,9 +32,15 @@ public class CommonRestController {
         return testAvroDto;
     }
 
-    @PostMapping("/kafka/test-dto")
+    @PostMapping("/kafka/test-dto-partition-1")
     public TestDto kafkaPayload(@RequestBody TestDto testDto) {
-        kafkaMessageSendService.sendDtoMessage(KafkaTopic.CUSTOM, testDto);
+        kafkaMessageSendService.sendDtoMessage(KafkaTopic.CUSTOM, testDto, 0);
+        return testDto;
+    }
+
+    @PostMapping("/kafka/test-dto-partition-2")
+    public TestDto kafkaPayload2(@RequestBody TestDto testDto) {
+        kafkaMessageSendService.sendDtoMessage(KafkaTopic.CUSTOM, testDto, 1);
         return testDto;
     }
 }
